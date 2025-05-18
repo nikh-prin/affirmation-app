@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Choose your database provider (e.g., PostgreSQL, MySQL, SQLite, MongoDB)
+  // For this example, let's assume PostgreSQL
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Store your database connection string in a .env file
+}
+
+// Represents a user of your application
+model User {
+  id        String      @id @default(uuid()) // Unique identifier for the user
+  email     String      @unique // User's email address (must be unique)
+  password  String      // Reverted to non-optional for standard auth
+  name      String?     // For user's name, potentially from Google
+  profileImageUrl String? // For user's profile picture, potentially from Google
+  googleId  String?     @unique // For storing Google User ID
+
+  authProvider String @default("email") // To track how the user signed up
+
+  createdAt DateTime    @default(now()) // Timestamp when the user was created
+  updatedAt DateTime    @updatedAt // Timestamp when the user record was last updated
+
+  // Relationship to the Subscription model (one user can have one active subscription)
+  subscription Subscription? // A user can optionally have one subscription
+
+  // Relationship to Favorite affirmations
+  favorites Favorite[]
+
+  @@map("users") // Maps the model name User to a table name "users" in the database
+}
+
+// Represents a user's subscription
+model Subscription {
+  id                String    @id @default(uuid()) // Unique identifier for the subscription record
+  userId            String    @unique // Foreign key linking to the User model (one-to-one relationship)
+  user              User      @relation(fields: [userId], references: [id]) // Defines the relationship back to the User model
+
+  status            String    // Current status of the subscription (e.g., "active", "cancelled", "expired", "trialing")
+  plan              String    // The subscription plan (e.g., "premium_monthly", "premium_yearly")
+  startDate         DateTime  // The date the subscription started
+  endDate           DateTime? // The date the subscription is scheduled to end (null for active, non-expiring)
+  renewalDate       DateTime? // The next date the subscription is scheduled to renew
+
+  // Fields related to the payment gateway (e.g., PhonePe)
+  paymentGateway    String    // The payment gateway used (e.g., "phonepe")
+  gatewaySubscriptionId String? // The ID of the subscription in the payment gateway's system (if applicable)
+  gatewayCustomerId String? // The ID of the customer in the payment gateway's system
+
+  createdAt         DateTime  @default(now()) // Timestamp when the subscription record was created
+  updatedAt         DateTime  @updatedAt // Timestamp when the subscription record was last updated
+
+  // Add other subscription-related fields as needed (e.g., frequency, trial_ends_at)
+  // frequency Int? // Could store the notification frequency here if it's tied to the subscription plan
+  // trialEndsAt DateTime?
+
+  @@map("subscriptions") // Maps the model name Subscription to a table name "subscriptions"
+}
+
+// Represents a user's favorite affirmation
+model Favorite {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  affirmationId String   // This will store the ID of the affirmation from affirmations.json
+  createdAt     DateTime @default(now())
+
+  @@unique([userId, affirmationId]) // Ensures a user cannot favorite the same affirmation multiple times
+  @@map("favorites")
+}
+
+// You might also consider a Payment model to log individual transactions
+// model Payment {
+//   id String @id @default(uuid())
+//   userId String
+//   user User @relation(fields: [userId], references: [id])
+//   amount Float // Payment amount
+//   currency String // Currency code (e.g., "INR")
+//   status String // Payment status (e.g., "successful", "failed", "pending")
+//   gatewayPaymentId String? // The payment ID from the gateway
+//   createdAt DateTime @default(now())
+//   @@map("payments")
+// }
+

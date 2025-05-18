@@ -1,0 +1,76 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnp.*
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+
+# Build folders
+/build
+/dist
+/out
+/.next
+/.nuxt
+/.cache
+
+# Expo
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Android/iOS
+android/app/debug.keystore
+android/app/release.keystore
+*.keystore
+*.p12
+*.mobileprovision
+*.cer
+*.apk
+*.aab
+*.ipa
+
+# Tests
+/coverage
+
+# IDE
+/.idea
+/.vscode
+*.swp
+*.swo
+
+# Prisma
+.prisma/client/
+migrations/**/*.sql
+
+# Misc
+.DS_Store
+.vercel
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
